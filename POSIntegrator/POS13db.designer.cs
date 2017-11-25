@@ -1634,8 +1634,6 @@ namespace POS13db
 		
 		private string _DefaultPriceDescription;
 		
-		private string _CustomerCode;
-		
 		private EntitySet<TrnCollection> _TrnCollections;
 		
 		private EntitySet<TrnSale> _TrnSales;
@@ -1688,8 +1686,6 @@ namespace POS13db
     partial void OnIsLockedChanged();
     partial void OnDefaultPriceDescriptionChanging(string value);
     partial void OnDefaultPriceDescriptionChanged();
-    partial void OnCustomerCodeChanging(string value);
-    partial void OnCustomerCodeChanged();
     #endregion
 		
 		public MstCustomer()
@@ -2075,26 +2071,6 @@ namespace POS13db
 					this._DefaultPriceDescription = value;
 					this.SendPropertyChanged("DefaultPriceDescription");
 					this.OnDefaultPriceDescriptionChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CustomerCode", DbType="NVarChar(50)")]
-		public string CustomerCode
-		{
-			get
-			{
-				return this._CustomerCode;
-			}
-			set
-			{
-				if ((this._CustomerCode != value))
-				{
-					this.OnCustomerCodeChanging(value);
-					this.SendPropertyChanging();
-					this._CustomerCode = value;
-					this.SendPropertyChanged("CustomerCode");
-					this.OnCustomerCodeChanged();
 				}
 			}
 		}
@@ -11459,8 +11435,6 @@ namespace POS13db
 		
 		private System.DateTime _UpdateDateTime;
 		
-		private string _PostCode;
-		
 		private EntitySet<TrnCollectionLine> _TrnCollectionLines;
 		
 		private EntitySet<TrnJournal> _TrnJournals;
@@ -11533,8 +11507,6 @@ namespace POS13db
     partial void OnUpdateUserIdChanged();
     partial void OnUpdateDateTimeChanging(System.DateTime value);
     partial void OnUpdateDateTimeChanged();
-    partial void OnPostCodeChanging(string value);
-    partial void OnPostCodeChanged();
     #endregion
 		
 		public TrnCollection()
@@ -12026,26 +11998,6 @@ namespace POS13db
 					this._UpdateDateTime = value;
 					this.SendPropertyChanged("UpdateDateTime");
 					this.OnUpdateDateTimeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PostCode", DbType="NVarChar(50)")]
-		public string PostCode
-		{
-			get
-			{
-				return this._PostCode;
-			}
-			set
-			{
-				if ((this._PostCode != value))
-				{
-					this.OnPostCodeChanging(value);
-					this.SendPropertyChanging();
-					this._PostCode = value;
-					this.SendPropertyChanged("PostCode");
-					this.OnPostCodeChanged();
 				}
 			}
 		}
@@ -18710,7 +18662,7 @@ namespace POS13db
 		
 		private decimal _NetPrice;
 		
-		private decimal _Quantity;
+		private System.Nullable<int> _Quantity;
 		
 		private decimal _Amount;
 		
@@ -18784,7 +18736,7 @@ namespace POS13db
     partial void OnDiscountAmountChanged();
     partial void OnNetPriceChanging(decimal value);
     partial void OnNetPriceChanged();
-    partial void OnQuantityChanging(decimal value);
+    partial void OnQuantityChanging(System.Nullable<int> value);
     partial void OnQuantityChanged();
     partial void OnAmountChanging(decimal value);
     partial void OnAmountChanged();
@@ -19029,8 +18981,8 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Decimal(18,5) NOT NULL")]
-		public decimal Quantity
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Int")]
+		public System.Nullable<int> Quantity
 		{
 			get
 			{
@@ -20512,7 +20464,7 @@ namespace POS13db
 		
 		private int _ApprovedBy;
 		
-		private int _IsLocked;
+		private bool _IsLocked;
 		
 		private int _EntryUserId;
 		
@@ -20562,7 +20514,7 @@ namespace POS13db
     partial void OnCheckedByChanged();
     partial void OnApprovedByChanging(int value);
     partial void OnApprovedByChanged();
-    partial void OnIsLockedChanging(int value);
+    partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnEntryUserIdChanging(int value);
     partial void OnEntryUserIdChanged();
@@ -20830,8 +20782,8 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsLocked", DbType="Int NOT NULL")]
-		public int IsLocked
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsLocked", DbType="Bit NOT NULL")]
+		public bool IsLocked
 		{
 			get
 			{
@@ -21119,7 +21071,7 @@ namespace POS13db
 		
 		private int _UnitId;
 		
-		private decimal _Quantity;
+		private System.Nullable<int> _Quantity;
 		
 		private decimal _Cost;
 		
@@ -21153,7 +21105,7 @@ namespace POS13db
     partial void OnItemIdChanged();
     partial void OnUnitIdChanging(int value);
     partial void OnUnitIdChanged();
-    partial void OnQuantityChanging(decimal value);
+    partial void OnQuantityChanging(System.Nullable<int> value);
     partial void OnQuantityChanged();
     partial void OnCostChanging(decimal value);
     partial void OnCostChanged();
@@ -21270,8 +21222,8 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Decimal(18,5) NOT NULL")]
-		public decimal Quantity
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Int")]
+		public System.Nullable<int> Quantity
 		{
 			get
 			{

@@ -63,7 +63,6 @@
       <Column Name="UpdateDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="IsLocked" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="DefaultPriceDescription" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
-      <Column Name="CustomerCode" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Association Name="MstCustomer_TrnCollection" Member="TrnCollections" ThisKey="Id" OtherKey="CustomerId" Type="TrnCollection" />
       <Association Name="MstCustomer_TrnSale" Member="TrnSales" ThisKey="Id" OtherKey="CustomerId" Type="TrnSale" />
       <Association Name="MstAccount_MstCustomer" Member="MstAccount" ThisKey="AccountId" OtherKey="Id" Type="MstAccount" IsForeignKey="true" />
@@ -494,7 +493,6 @@
       <Column Name="EntryDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdateUserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UpdateDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="PostCode" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Association Name="TrnCollection_TrnCollectionLine" Member="TrnCollectionLines" ThisKey="Id" OtherKey="CollectionId" Type="TrnCollectionLine" />
       <Association Name="TrnCollection_TrnJournal" Member="TrnJournals" ThisKey="Id" OtherKey="CollectionId" Type="TrnJournal" />
       <Association Name="TrnCollection_TrnStockIn" Member="TrnStockIns" ThisKey="Id" OtherKey="CollectionId" Type="TrnStockIn" />
@@ -766,7 +764,7 @@
       <Column Name="DiscountRate" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="DiscountAmount" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="NetPrice" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="Quantity" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="Amount" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="TaxId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="TaxRate" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
@@ -841,7 +839,7 @@
       <Column Name="PreparedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="CheckedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ApprovedBy" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="IsLocked" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="IsLocked" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Column Name="EntryUserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="EntryDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdateUserId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
@@ -860,7 +858,7 @@
       <Column Name="StockInId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ItemId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UnitId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="Quantity" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="Cost" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="Amount" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="ExpiryDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
