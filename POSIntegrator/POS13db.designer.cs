@@ -3393,7 +3393,7 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ItemCode", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ItemCode", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
 		public string ItemCode
 		{
 			get
@@ -3413,7 +3413,7 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BarCode", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_BarCode", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
 		public string BarCode
 		{
 			get
@@ -3433,7 +3433,7 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ItemDescription", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ItemDescription", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
 		public string ItemDescription
 		{
 			get
@@ -3453,7 +3453,7 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Alias", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Alias", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
 		public string Alias
 		{
 			get
@@ -3473,7 +3473,7 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GenericName", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_GenericName", DbType="NVarChar(100) NOT NULL", CanBeNull=false)]
 		public string GenericName
 		{
 			get
@@ -18662,7 +18662,7 @@ namespace POS13db
 		
 		private decimal _NetPrice;
 		
-		private System.Nullable<int> _Quantity;
+		private int _Quantity;
 		
 		private decimal _Amount;
 		
@@ -18736,7 +18736,7 @@ namespace POS13db
     partial void OnDiscountAmountChanged();
     partial void OnNetPriceChanging(decimal value);
     partial void OnNetPriceChanged();
-    partial void OnQuantityChanging(System.Nullable<int> value);
+    partial void OnQuantityChanging(int value);
     partial void OnQuantityChanged();
     partial void OnAmountChanging(decimal value);
     partial void OnAmountChanged();
@@ -18981,8 +18981,8 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Int")]
-		public System.Nullable<int> Quantity
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Int NOT NULL")]
+		public int Quantity
 		{
 			get
 			{
@@ -21071,7 +21071,7 @@ namespace POS13db
 		
 		private int _UnitId;
 		
-		private System.Nullable<int> _Quantity;
+		private decimal _Quantity;
 		
 		private decimal _Cost;
 		
@@ -21105,7 +21105,7 @@ namespace POS13db
     partial void OnItemIdChanged();
     partial void OnUnitIdChanging(int value);
     partial void OnUnitIdChanged();
-    partial void OnQuantityChanging(System.Nullable<int> value);
+    partial void OnQuantityChanging(decimal value);
     partial void OnQuantityChanged();
     partial void OnCostChanging(decimal value);
     partial void OnCostChanged();
@@ -21222,8 +21222,8 @@ namespace POS13db
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Int")]
-		public System.Nullable<int> Quantity
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Quantity", DbType="Decimal(18,5) NOT NULL")]
+		public decimal Quantity
 		{
 			get
 			{
