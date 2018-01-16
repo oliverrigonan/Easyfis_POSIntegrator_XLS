@@ -416,7 +416,6 @@ namespace POSIntegrator
                         }
                         else
                         {
-                            Console.WriteLine();
                             Console.WriteLine("No XLS Found...");
                         }
                     }
