@@ -41,9 +41,9 @@ namespace POSIntegrator
             return result;
         }
 
-        // =============
-        // Sync Stock In
-        // =============
+        // ===========================
+        // Sync Stock In and Stock Out
+        // ===========================
         public static void SyncStockInAndStockOut(String xlsINPath, String xlsOTPath, String database)
         {
             try
@@ -455,7 +455,7 @@ namespace POSIntegrator
             {
                 if (i == 0) { xlsINPath = arg; }
                 else if (i == 1) { xlsOTPath = arg; }
-                else if (i == 1) { database = arg; }
+                else if (i == 2) { database = arg; }
                 i++;
             }
 
