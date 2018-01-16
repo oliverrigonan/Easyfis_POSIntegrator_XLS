@@ -23,7 +23,7 @@ namespace POSIntegrator
         // =============
         // Data Contexts
         // =============
-        private static POS13db.POS13dbDataContext posData = new POS13db.POS13dbDataContext();
+        private static POS13db.POS13dbDataContext posData;
 
         // ===================
         // Fill Leading Zeroes
@@ -41,32 +41,31 @@ namespace POSIntegrator
             return result;
         }
 
-        // ============
-        // Sync StockIn
-        // ============
-        public static void SyncStockIn(string xlsPath)
+        // =============
+        // Sync Stock In
+        // =============
+        public static void SyncStockInAndStockOut(String xlsPath, String database)
         {
             try
             {
-                Console.WriteLine("Scanning XLS Files...");
-                Boolean hasFiles = false;
+                var newConnectionString = "Data Source=localhost;Initial Catalog=" + database + ";Integrated Security=True";
+                posData = new POS13db.POS13dbDataContext(newConnectionString);
 
-                List<string> files = new List<string>(Directory.EnumerateFiles(xlsPath));
+                List<String> files = new List<String>(Directory.EnumerateFiles(xlsPath));
                 foreach (var file in files)
                 {
-                    hasFiles = true;
                     Excel.Application xlApp = new Excel.Application();
                     Excel.Workbook xlWorkBook = xlApp.Workbooks.Open(file, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
                     Excel.Worksheet xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
                     Excel.Range range = xlWorkSheet.UsedRange;
 
                     Int32 stockInId = 0;
+                    Int32 stockOutId = 0;
 
                     Int32 row = range.Rows.Count;
                     Int32 column = range.Columns.Count;
 
                     Console.WriteLine("Saving " + (range.Cells[2, 1] as Excel.Range).Value2 + "...");
-                    Console.WriteLine();
 
                     for (Int32 rowCount = 1; rowCount <= row; rowCount++)
                     {
@@ -81,18 +80,28 @@ namespace POSIntegrator
                                 Decimal cost = Convert.ToDecimal((range.Cells[rowCount, 5] as Excel.Range).Value2);
                                 Decimal amount = Convert.ToDecimal((range.Cells[rowCount, 6] as Excel.Range).Value2);
 
+                                // ========
+                                // Defaults 
+                                // ========
+                                var defaultPeriod = from d in posData.MstPeriods
+                                                    select d;
+
+                                var defaultSettings = from d in posData.SysSettings
+                                                      select d;
+
+                                var defaultExpenseAccounts = from d in posData.MstAccounts
+                                                             where d.AccountType.Equals("EXPENSES")
+                                                             select d;
+
+                                // =============
+                                // Sync Stock In
+                                // =============
                                 var stockIn = from d in posData.TrnStockIns
                                               where d.Remarks.Equals(documentReference)
                                               select d;
 
                                 if (!stockIn.Any())
                                 {
-                                    var defaultPeriod = from d in posData.MstPeriods
-                                                        select d;
-
-                                    var defaultSettings = from d in posData.SysSettings
-                                                          select d;
-
                                     var defaultStockInNumber = defaultPeriod.FirstOrDefault().Period + "-000001";
 
                                     var lastStockIn = from d in posData.TrnStockIns.OrderByDescending(d => d.Id)
@@ -167,6 +176,91 @@ namespace POSIntegrator
                                             updateItem.OnhandQuantity = totalQuantity;
                                         }
 
+                                        Console.WriteLine("Inserting Stock-In Item: " + item + "...");
+
+                                        posData.SubmitChanges();
+                                        Console.WriteLine(item + " was successfuly saved!");
+                                    }
+                                }
+
+                                // ==============
+                                // Sync Stock Out
+                                // ==============
+                                var stockOut = from d in posData.TrnStockOuts
+                                               where d.Remarks.Equals(documentReference)
+                                               select d;
+
+                                if (!stockOut.Any())
+                                {
+                                    var defaultStockOutNumber = defaultPeriod.FirstOrDefault().Period + "-000001";
+
+                                    var lastStockOut = from d in posData.TrnStockOuts.OrderByDescending(d => d.Id)
+                                                       select d;
+
+                                    if (lastStockOut.Any())
+                                    {
+                                        var lastStockOutNumber = lastStockOut.FirstOrDefault().StockOutNumber.ToString();
+                                        int secondIndex = lastStockOutNumber.IndexOf('-', lastStockOutNumber.IndexOf('-'));
+                                        var stockOutNumberSplitStringValue = lastStockOutNumber.Substring(secondIndex + 1);
+                                        var stockOutNumber = Convert.ToInt32(stockOutNumberSplitStringValue) + 000001;
+                                        defaultStockOutNumber = defaultPeriod.FirstOrDefault().Period + "-" + FillLeadingZeroes(stockOutNumber, 6);
+                                    }
+
+                                    POS13db.TrnStockOut newStockOut = new POS13db.TrnStockOut
+                                    {
+                                        PeriodId = defaultPeriod.FirstOrDefault().Id,
+                                        StockOutDate = DateTime.Today,
+                                        StockOutNumber = defaultStockOutNumber,
+                                        AccountId = defaultExpenseAccounts.FirstOrDefault().Id,
+                                        Remarks = documentReference,
+                                        PreparedBy = defaultSettings.FirstOrDefault().PostUserId,
+                                        CheckedBy = defaultSettings.FirstOrDefault().PostUserId,
+                                        ApprovedBy = defaultSettings.FirstOrDefault().PostUserId,
+                                        IsLocked = true,
+                                        EntryUserId = defaultSettings.FirstOrDefault().PostUserId,
+                                        EntryDateTime = DateTime.Now,
+                                        UpdateUserId = defaultSettings.FirstOrDefault().PostUserId,
+                                        UpdateDateTime = DateTime.Now
+                                    };
+
+                                    posData.TrnStockOuts.InsertOnSubmit(newStockOut);
+                                    posData.SubmitChanges();
+
+                                    stockOutId = newStockOut.Id;
+
+                                    var items = from d in posData.MstItems
+                                                where d.BarCode.Equals(barCode)
+                                                select d;
+
+                                    if (items.Any())
+                                    {
+                                        POS13db.TrnStockOutLine newStockOutLine = new POS13db.TrnStockOutLine
+                                        {
+                                            StockOutId = stockOutId,
+                                            ItemId = items.FirstOrDefault().Id,
+                                            UnitId = items.FirstOrDefault().UnitId,
+                                            Quantity = Convert.ToDecimal(quantity),
+                                            Cost = Convert.ToDecimal(cost),
+                                            Amount = Convert.ToDecimal(amount),
+                                            AssetAccountId = items.FirstOrDefault().AssetAccountId
+                                        };
+
+                                        posData.TrnStockOutLines.InsertOnSubmit(newStockOutLine);
+
+                                        var currentItem = from d in posData.MstItems
+                                                          where d.Id == newStockOutLine.ItemId
+                                                          select d;
+
+                                        if (currentItem.Any())
+                                        {
+                                            Decimal currentOnHandQuantity = currentItem.FirstOrDefault().OnhandQuantity;
+                                            Decimal totalQuantity = currentOnHandQuantity - Convert.ToDecimal(quantity);
+                                            var updateItem = currentItem.FirstOrDefault();
+                                            updateItem.OnhandQuantity = totalQuantity;
+                                        }
+
+                                        Console.WriteLine("Inserting Stock-Out Item: " + item + "...");
+
                                         posData.SubmitChanges();
                                         Console.WriteLine(item + " was successfuly saved!");
                                     }
@@ -183,6 +277,9 @@ namespace POSIntegrator
                                     Decimal cost = Convert.ToDecimal((range.Cells[rowCount, 5] as Excel.Range).Value2);
                                     Decimal amount = Convert.ToDecimal((range.Cells[rowCount, 6] as Excel.Range).Value2);
 
+                                    // ==============
+                                    // Stock In Items
+                                    // ==============
                                     if (stockInId > 0)
                                     {
                                         var items = from d in posData.MstItems
@@ -219,6 +316,51 @@ namespace POSIntegrator
                                                 updateItem.OnhandQuantity = totalQuantity;
                                             }
 
+                                            Console.WriteLine("Inserting Stock-In Item: " + item + "...");
+
+                                            posData.SubmitChanges();
+                                            Console.WriteLine(item + " was successfuly saved!");
+                                        }
+                                    }
+
+                                    // ===============
+                                    // Stock Out Items
+                                    // ===============
+                                    if (stockOutId > 0)
+                                    {
+                                        var items = from d in posData.MstItems
+                                                    where d.BarCode.Equals(barCode)
+                                                    select d;
+
+                                        if (items.Any())
+                                        {
+                                            POS13db.TrnStockOutLine newStockOutLine = new POS13db.TrnStockOutLine
+                                            {
+                                                StockOutId = stockOutId,
+                                                ItemId = items.FirstOrDefault().Id,
+                                                UnitId = items.FirstOrDefault().UnitId,
+                                                Quantity = Convert.ToDecimal(quantity),
+                                                Cost = Convert.ToDecimal(cost),
+                                                Amount = Convert.ToDecimal(amount),
+                                                AssetAccountId = items.FirstOrDefault().AssetAccountId
+                                            };
+
+                                            posData.TrnStockOutLines.InsertOnSubmit(newStockOutLine);
+
+                                            var currentItem = from d in posData.MstItems
+                                                              where d.Id == newStockOutLine.ItemId
+                                                              select d;
+
+                                            if (currentItem.Any())
+                                            {
+                                                Decimal currentOnHandQuantity = currentItem.FirstOrDefault().OnhandQuantity;
+                                                Decimal totalQuantity = currentOnHandQuantity - Convert.ToDecimal(quantity);
+                                                var updateItem = currentItem.FirstOrDefault();
+                                                updateItem.OnhandQuantity = totalQuantity;
+                                            }
+
+                                            Console.WriteLine("Inserting Stock-Out Item: " + item + "...");
+
                                             posData.SubmitChanges();
                                             Console.WriteLine(item + " was successfuly saved!");
                                         }
@@ -226,15 +368,11 @@ namespace POSIntegrator
                                 }
                             }
                         }
+
+                        Console.WriteLine();
                     }
 
                     File.Delete(file);
-                }
-
-                if (!hasFiles)
-                {
-                    Console.WriteLine("No XLS Files Found...");
-                    Console.WriteLine();
                 }
             }
             catch (Exception e)
@@ -248,17 +386,19 @@ namespace POSIntegrator
         // ===========
         static void Main(string[] args)
         {
+            String xlsPath = "", database = "";
+
             int i = 0;
-            string xlsPath = "";
             foreach (var arg in args)
             {
                 if (i == 0) { xlsPath = arg; }
+                else if (i == 1) { database = arg; }
                 i++;
             }
 
-            Console.WriteLine("Innosoft POS XLS Uploader");
-            Console.WriteLine("Version: 1.20170907      ");
-            Console.WriteLine("=========================");
+            Console.WriteLine("====================================");
+            Console.WriteLine("POS XLS Uploader Version: 1.20180116");
+            Console.WriteLine("====================================");
 
             while (true)
             {
@@ -267,7 +407,18 @@ namespace POSIntegrator
                     if (!xlsPath.Equals(""))
                     {
                         Console.WriteLine();
-                        SyncStockIn(xlsPath);
+                        Console.WriteLine("Scanning XLS Files...");
+
+                        List<string> files = new List<string>(Directory.EnumerateFiles(xlsPath));
+                        if (files.Any())
+                        {
+                            SyncStockInAndStockOut(xlsPath, database);
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("No XLS Found...");
+                        }
                     }
                     else
                     {
